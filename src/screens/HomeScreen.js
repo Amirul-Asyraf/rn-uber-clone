@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Text, SafeAreaView, Image } from "react-native";
 import tw from "twrnc";
 import NavOptions from "../components/NavOptions";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { GOOGLE_MAPS_KEY } from "@env";
 import { useSelector, useDispatch } from "react-redux";
-import { setDestination, setOrigin } from "../slices/navSlice";
+import { selectOrigin, setDestination, setOrigin } from "../slices/navSlice";
 import NavFavourites from "../components/NavFavourites";
 
 const HomeScreen = () => {
 	const dispatch = useDispatch();
+	const mapRef = useRef(null);
+	const origin = useSelector(selectOrigin);
+
+	useEffect(() => {
+		if (!origin) return;
+		mapRef.current?.setAddressText(origin.description);
+	}, [origin]);
 
 	return (
 		<SafeAreaView style={tw`bg-white h-full`}>
@@ -25,6 +32,7 @@ const HomeScreen = () => {
 					}}
 				/>
 				<GooglePlacesAutocomplete
+					ref={mapRef}
 					placeholder="Where from?"
 					styles={{
 						container: {
@@ -41,6 +49,7 @@ const HomeScreen = () => {
 								description: data.description,
 							})
 						);
+
 						dispatch(setDestination(null));
 					}}
 					fetchDetails={true}

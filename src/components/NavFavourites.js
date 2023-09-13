@@ -8,23 +8,58 @@ import {
 import React from "react";
 import { Icon } from "@rneui/themed";
 import tw from "twrnc";
+import { useDispatch } from "react-redux";
+import { setDestination, setOrigin } from "../slices/navSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const data = [
 	{
 		id: "123",
 		icon: "home",
-		location: "Home",
+		name: "Home",
 		destination: "Code Street, London, UK",
+		location: {
+			lat: 51.5223932,
+			lng: -0.07082999999999999,
+		},
 	},
 	{
 		id: "456",
 		icon: "briefcase",
-		location: "Work",
+		name: "Work",
 		destination: "London Eye, London, UK",
+		location: {
+			lat: 51.5031864,
+			lng: -0.1195192,
+		},
 	},
 ];
 
-const NavFavourites = () => {
+const NavFavourites = ({ type = "origin" }) => {
+	const dispatch = useDispatch();
+	const navigation = useNavigation();
+
+	const dispatchOrigin = (location, destination) => {
+		dispatch(
+			setOrigin({
+				location,
+				description: destination,
+			})
+		);
+
+		dispatch(setDestination(null));
+	};
+
+	const dispatchDestination = (location, destination) => {
+		dispatch(
+			setDestination({
+				location,
+				description: destination,
+			})
+		);
+
+		navigation.navigate("RideOptionsCard");
+	};
 	return (
 		<FlatList
 			data={data}
@@ -32,8 +67,15 @@ const NavFavourites = () => {
 			ItemSeparatorComponent={() => (
 				<View style={[tw`bg-gray-200`, { height: 0.5 }]} />
 			)}
-			renderItem={({ item: { location, destination, icon } }) => (
-				<TouchableOpacity style={tw`flex-row items-center p-5`}>
+			renderItem={({ item: { name, location, destination, icon } }) => (
+				<TouchableOpacity
+					onPress={() => {
+						type === "origin"
+							? dispatchOrigin(location, destination)
+							: dispatchDestination(location, destination);
+					}}
+					style={tw`flex-row items-center p-5`}
+				>
 					<Icon
 						style={tw`mr-4 rounded-full bg-gray-300 p-3`}
 						name={icon}
@@ -41,7 +83,7 @@ const NavFavourites = () => {
 						size={18}
 					/>
 					<View>
-						<Text style={tw`font-semibold text-lg`}>{location}</Text>
+						<Text style={tw`font-semibold text-lg`}>{name}</Text>
 						<Text style={tw`text-gray-500`}>{destination}</Text>
 					</View>
 				</TouchableOpacity>

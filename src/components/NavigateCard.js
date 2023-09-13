@@ -5,12 +5,12 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import tw from "twrnc";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { GOOGLE_MAPS_KEY } from "@env";
-import { useDispatch } from "react-redux";
-import { setDestination } from "../slices/navSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectDestination, setDestination } from "../slices/navSlice";
 import { useNavigation } from "@react-navigation/native";
 import NavFavourites from "./NavFavourites";
 import { Icon } from "@rneui/themed";
@@ -18,6 +18,13 @@ import { Icon } from "@rneui/themed";
 const NavigateCard = () => {
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
+	const mapRef = useRef(null);
+	const destination = useSelector(selectDestination);
+
+	useEffect(() => {
+		if (!destination) return;
+		mapRef.current?.setAddressText(destination.description);
+	}, [destination]);
 
 	return (
 		<SafeAreaView style={tw`bg-white flex-1`}>
@@ -25,6 +32,7 @@ const NavigateCard = () => {
 			<View style={tw`border-t border-gray-200 flex-shrink`}>
 				<View>
 					<GooglePlacesAutocomplete
+						ref={mapRef}
 						placeholder="Where to?"
 						styles={toInputBoxStyles}
 						fetchDetails={true}
@@ -48,7 +56,7 @@ const NavigateCard = () => {
 						debounce={400}
 					/>
 				</View>
-				<NavFavourites />
+				<NavFavourites type="destination" />
 			</View>
 			<View
 				style={tw`flex-row bg-white justify-evenly py-2 mt-auto border-t border-gray-100`}
