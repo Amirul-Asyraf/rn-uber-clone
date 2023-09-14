@@ -1,4 +1,4 @@
-# Uber Clone built using React Native (Expo)
+# Uber Clone 🚗 built using React Native (Expo) 📱
 
 Uber clone app built using React Native (Expo), Redux, Tailwind, and leveraging off of Google Places Autocomplete API.
 
